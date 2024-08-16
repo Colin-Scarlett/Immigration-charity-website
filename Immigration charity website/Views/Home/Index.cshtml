@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<main>
+    <section class="jumbotron text-center">
+        <div class="container">
+            <h1 class="jumbotron-heading">Welcome to Immigration Charity Website</h1>
+            <p class="lead text-muted">Dedicated to improving the health and well-being of underrepresented communities, focusing on migrant communities.</p>
+            <p>
+                <a href="@Url.Action("Index", "Services")" class="btn btn-primary my-2">Our Services</a>
+                <a href="@Url.Action("About", "Home")" class="btn btn-secondary my-2">Learn More About Us</a>
+                <a href="@Url.Action("Contact", "Home")" class="btn btn-secondary my-2">Contact Us</a>
+            </p>
+        </div>
+    </section>
+
+    <div class="row">
+        <section class="col-md-4">
+            <h2>Highlighted Resources</h2>
+            <p>Access key resources quickly, including health guides, support services, and more.</p>
+            <p><a class="btn btn-outline-dark" href="#">Learn more &raquo;</a></p>
+        </section>
+        <section class="col-md-4">
+            <h2>Latest News</h2>
+            <p>Stay updated with the latest news and updates from our organization.</p>
+            <p><a class="btn btn-outline-dark" href="#">Read News &raquo;</a></p>
+        </section>
+        <section class="col-md-4">
+            <h2>Quick Links</h2>
+            <p>Navigate to main sections quickly for easy access to important information.</p>
+            <p><a class="btn btn-outline-dark" href="#">Go to Links &raquo;</a></p>
+        </section>
+    </div>
+</main>

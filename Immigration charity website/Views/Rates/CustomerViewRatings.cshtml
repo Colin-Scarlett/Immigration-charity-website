@@ -1,0 +1,35 @@
+﻿@model Immigration_charity_website.Models.AverageRatingViewModel
+
+<h2>Your Ratings</h2>
+
+<div>
+    <p><strong>Average Rating:</strong> @ViewBag.AverageRating</p>
+</div>
+
+<table id="ratingsTable" class="table">
+    <thead>
+        <tr>
+            <th>Rating Value</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Ratings)
+        {
+            <tr>
+                <td>@item.RatingValue</td>
+                <td>@item.CreatedAt</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-info" }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @Html.ActionLink("Create New Rating", "Create", null, new { @class = "btn btn-primary" })
+</div>

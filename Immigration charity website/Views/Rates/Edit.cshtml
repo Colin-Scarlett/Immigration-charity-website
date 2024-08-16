@@ -1,0 +1,26 @@
+﻿@model Immigration_charity_website.Models.AverageRatingViewModel
+
+@{
+    ViewBag.Title = "Edit Rating";
+}
+
+<h2>Edit Rating</h2>
+
+@using (Html.BeginForm("Edit", "Rates", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @* Hidden field for the rating ID *@
+    @Html.HiddenFor(model => model.Ratings.FirstOrDefault().Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.RatingValue, "Rating Value")
+        @Html.DropDownListFor(model => model.RatingValue, Model.RatingOptions, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.RatingValue)
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+    </div>
+}

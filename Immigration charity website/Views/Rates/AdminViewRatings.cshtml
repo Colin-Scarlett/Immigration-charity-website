@@ -1,0 +1,170 @@
+﻿@model Immigration_charity_website.Models.AverageRatingViewModel
+@using Newtonsoft.Json
+
+@{
+    ViewBag.Title = "管理员查看评分";
+}
+
+<h2>所有评分</h2>
+
+<div>
+    <p><strong>平均评分:</strong> @ViewBag.AverageRating</p>
+</div>
+<div>
+    <button id="exportCsvBtn" class="btn btn-secondary">导出为 CSV</button>
+    <button id="exportExcelBtn" class="btn btn-secondary">导出为 Excel</button>
+</div>
+
+<!-- 可访问的评分表格 -->
+<table id="ratingsTable" class="table table-striped table-bordered" aria-describedby="ratingsTableDescription">
+    <caption id="ratingsTableDescription" class="sr-only">此表格显示所有评分，并提供编辑、查看详细信息或删除每条评分的选项。</caption>
+    <thead>
+        <tr>
+            <th scope="col">用户名</th>
+            <th scope="col">评分值</th>
+            <th scope="col">创建时间</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Ratings)
+        {
+            <tr>
+                <td>@item.User.UserName</td>
+                <td>@item.RatingValue</td>
+                <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>
+                    @Html.ActionLink("编辑", "Edit", new { id = item.Id }, new { @class = "btn btn-warning", @aria_label = "编辑用户 " + item.User.UserName + " 的评分" }) |
+                    @Html.ActionLink("详细信息", "Details", new { id = item.Id }, new { @class = "btn btn-info", @aria_label = "查看用户 " + item.User.UserName + " 的评分详细信息" }) |
+                    @Html.ActionLink("删除", "Delete", new { id = item.Id }, new { @class = "btn btn-danger", @aria_label = "删除用户 " + item.User.UserName + " 的评分" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @Html.ActionLink("创建新评分", "Create", null, new { @class = "btn btn-primary", @aria_label = "创建新评分" })
+</div>
+
+<!-- 柱状图的 Canvas 元素 -->
+<div>
+    <h3>评分分布</h3>
+    <canvas id="ratingsChart" width="400" height="200"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+    <!-- Chart.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('#ratingsTable').DataTable({
+            "paging": true,
+            "pageLength": 10,
+            "lengthChange": false,
+            "searching": true,
+            "ordering": true,
+            "order": [[2, 'desc']],
+            "columnDefs": [
+                { "orderable": false, "targets": 3 }
+            ]
+        });
+
+        // 确保数据表可通过键盘导航
+        $('#ratingsTable').on('draw.dt', function () {
+            $('#ratingsTable tbody tr').attr('tabindex', '0'); // 为行添加 tabindex
+        });
+
+        // 准备 Chart.js 数据
+        var ratings = @Html.Raw(JsonConvert.SerializeObject(Model.Ratings.Select(r => new { r.RatingValue }).GroupBy(r => r.RatingValue).ToDictionary(g => g.Key, g => g.Count())));
+        var labels = Object.keys(ratings);
+        var data = Object.values(ratings);
+
+        // 创建柱状图
+        var ctx = document.getElementById('ratingsChart').getContext('2d');
+        var ratingsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '评分数量',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 导出为CSV的功能
+        $('#exportCsvBtn').click(function () {
+            var csvData = [];
+            csvData.push(["用户名", "评分值", "创建时间"]);
+
+            @foreach (var item in Model.Ratings)
+            {
+                <text>
+                csvData.push(["@item.User.UserName", "@item.RatingValue", "@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")"]);
+                </text>
+            }
+
+            var csvContent = "data:text/csv;charset=utf-8," + csvData.map(e => e.join(",")).join("\n");
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "ratings.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // 导出为Excel的功能
+        $('#exportExcelBtn').click(function () {
+            var tableHtml = '<table border="1"><thead><tr><th>用户名</th><th>评分值</th><th>创建时间</th></tr></thead><tbody>';
+
+            @foreach (var item in Model.Ratings)
+            {
+                <text>
+                tableHtml += '<tr><td>@item.User.UserName</td><td>@item.RatingValue</td><td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td></tr>';
+                </text>
+            }
+
+            tableHtml += '</tbody></table>';
+
+            var excelFile = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40'>";
+            excelFile += "<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>";
+            excelFile += "<x:Name>Sheet1</x:Name>";
+            excelFile += "<x:WorksheetOptions><x:Panes></x:Panes></x:WorksheetOptions></x:ExcelWorksheet>";
+            excelFile += "</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->";
+            excelFile += "</head><body>";
+            excelFile += tableHtml;
+            excelFile += "</body></html>";
+
+            var blob = new Blob([excelFile], { type: 'application/vnd.ms-excel' });
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "ratings.xls";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+    </script>
+}

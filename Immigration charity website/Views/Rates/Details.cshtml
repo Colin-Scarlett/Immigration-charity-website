@@ -1,0 +1,17 @@
+﻿@model Immigration_charity_website.Models.Rates
+
+<h2>Rating Details</h2>
+
+<div>
+    <h4>Rating</h4>
+    <dl class="dl-horizontal">
+        <dt>User Name</dt>
+        <dd>@Model.User.UserName</dd>
+        <dt>Rating Value</dt>
+        <dd>@Model.RatingValue</dd>
+        <dt>Created At</dt>
+        <dd>@Model.CreatedAt</dd>
+    </dl>
+
+    @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+</div>

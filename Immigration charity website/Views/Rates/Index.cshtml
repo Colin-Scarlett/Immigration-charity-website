@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Immigration_charity_website.Models.Rates>
+
+@{
+    ViewBag.Title = "Ratings Index";
+    var isAdmin = User.IsInRole("Admin");
+    var isCustomer = User.IsInRole("Customer");
+}
+
+@if (isAdmin)
+{
+    @Html.Partial("AdminViewRatings", Model)
+}
+else if (isCustomer)
+{
+    @Html.Partial("CustomerViewRatings", Model)
+}
+else
+{
+    <div class="alert alert-danger">
+        You do not have permission to view this page.
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#ratingsTable').DataTable({
+                "paging": true,
+                "pageLength": 10,
+                "searching": true,
+                "ordering": true,
+                "info": true
+            });
+        });
+    </script>
+}
